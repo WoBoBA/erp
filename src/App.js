@@ -5,7 +5,7 @@ import Calender from "./components/Calendar";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 import Content from "./components/Content";
-import A from "./components/test";
+import Prod from "./components/Prod";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <Route path="/" element={<Content />} />
         <Route path="/404" element={<NoPage />} />
         <Route path="/calender" element={<Calender />} />
-        <Route path="/test" element={<A />} />
+        <Route path="/Prod" element={<Prod />} />
       </Routes>
       <Footer />
     </BrowserRouter>

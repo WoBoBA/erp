@@ -3,7 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Modal, Form, Button } from "react-bootstrap";
+import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 
 function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -12,15 +12,18 @@ function Calendar() {
   //const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState("");
   const [shift, setShift] = useState("");
-  const [exp, setExp] = useState("");
+  const [exp_m, setExp_m] = useState("");
+  const [exp_y, setExp_y] = useState("");
   const [shipment, setShipment] = useState("");
   const [qty, setQty] = useState("");
   const [datestar, setDatestar] = useState("");
   const [dateend, setDateend] = useState("");
   const [ass_line, setAss_line] = useState("");
+  const [alternate, setAlternate] = useState("");
   const [events, setEvents] = useState([]);
-  const [lines, setLine] = useState([]);
-  const [models, setModel] = useState([]);
+  const [data_lines, setData_Line] = useState([]);
+  const [data_models, setData_Model] = useState([]);
+  const [data_alternates, setData_Alternate] = useState([]);
 
   const handleModalClose = () => {
     setSelectedEvent(null);
@@ -127,7 +130,7 @@ function Calendar() {
     //setIsLoading(true);
 
     event.preventDefault();
-    if (modal === "" || ass_line === "") {
+    if (modal === "" || ass_line === "" || exp_m === "" || exp_y === "" || alternate === "") {
       setShowError(true);
     } else {
       const myHeaders = new Headers();
@@ -136,12 +139,14 @@ function Calendar() {
       const raw = JSON.stringify({
         modal: modal,
         shift: shift,
-        exp: exp,
+        exp: exp_m + '-' + exp_y,
         shipment: shipment,
         qty: qty,
         datestar: datestar,
         dateend: dateend,
         ass_line: ass_line,
+        alternate : alternate,
+        status : 0,
       });
 
       const requestOptions = {
@@ -154,7 +159,7 @@ function Calendar() {
       fetch("http://localhost:3336/production", requestOptions)
         .then((response) => response.json())
         .then((result) => {
-          //alert(raw);
+          //console.log(result["message"])
           alert(result["message"]);
           if (result["status"] === "OK") {
             window.location.href = "/calender";
@@ -165,24 +170,39 @@ function Calendar() {
   };
 
   const data_model = (e) => {
-    setAss_line(e.target.value)
+    setAss_line(e.target.value);
     const line = e.target.value;
     fetch(`http://localhost:3336/model/${line}`)
       .then((response) => response.json())
       .then((data) => {
         //console.log(data);
-        setModel(data);
+        setData_Model(data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   };
 
+  const data_alternate = (e) => {
+    setModal(e.target.value);
+    const model = e.target.value;
+    fetch(`http://localhost:3336/alternate/${encodeURIComponent(model)}`)
+      .then((response) => response.json())
+      .then((data) => {
+        //console.log(data);
+        setData_Alternate(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  };
+
+
   const data_line = () => {
     fetch("http://localhost:3336/line")
       .then((response) => response.json())
       .then((data) => {
-        setLine(data);
+        setData_Line(data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -212,6 +232,43 @@ function Calendar() {
         console.error("Error fetching events:", error);
       });
   };
+
+  const radioOptions = [
+    { label: "A", value: "A" },
+    { label: "B", value: "B" },
+    { label: "C", value: "C" },
+    { label: "8", value: "8" },
+  ];
+
+  const exp_month = [
+    { label: "01", value: "01" },
+    { label: "02", value: "02" },
+    { label: "03", value: "03" },
+    { label: "04", value: "04" },
+    { label: "05", value: "05" },
+    { label: "06", value: "06" },
+    { label: "07", value: "07" },
+    { label: "08", value: "08" },
+    { label: "09", value: "09" },
+    { label: "10", value: "10" },
+    { label: "11", value: "11" },
+    { label: "12", value: "12" },
+  ];
+
+  const exp_year = [
+    { label: new Date().getFullYear() - 1, value: new Date().getFullYear() - 1 },
+    { label: new Date().getFullYear(), value: new Date().getFullYear() },
+    { label: new Date().getFullYear() + 1, value: new Date().getFullYear() + 1 },
+    { label: new Date().getFullYear() + 2, value: new Date().getFullYear() + 2 },
+    { label: new Date().getFullYear() + 3, value: new Date().getFullYear() + 3 },
+    { label: new Date().getFullYear() + 4, value: new Date().getFullYear() + 4 },
+    { label: new Date().getFullYear() + 5, value: new Date().getFullYear() + 5 },
+    { label: new Date().getFullYear() + 6, value: new Date().getFullYear() + 6 },
+    { label: new Date().getFullYear() + 7, value: new Date().getFullYear() + 7 },
+    { label: new Date().getFullYear() + 8, value: new Date().getFullYear() + 8 },
+    { label: new Date().getFullYear() + 9, value: new Date().getFullYear() + 9 },
+    { label: new Date().getFullYear() + 10, value: new Date().getFullYear() + 10 },
+  ];
 
   useEffect(() => {
     data_event();
@@ -263,19 +320,19 @@ function Calendar() {
                     events={events}
                     eventClick={handleEventClick}
                     eventChange={handleEventResize}
-                    //eventChange={handleChange}
-                    //nextDayThreshold={"23:00:00"}
-                    /* weekends={this.state.weekendsVisible}
-                    initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-                    select={this.handleDateSelect}
-                    eventContent={renderEventContent} // custom render function
-                    eventClick={this.handleEventClick}
-                    eventsSet={this.handleEvents}  */ // called after events are initialized/added/changed/removed
-                    /* you can update a remote database when these fire:
-                    eventAdd={function(){}}
-                    eventChange={function(){}}
-                    eventRemove={function(){}}
-                  */
+                  //eventChange={handleChange}
+                  //nextDayThreshold={"23:00:00"}
+                  /* weekends={this.state.weekendsVisible}
+                  initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+                  select={this.handleDateSelect}
+                  eventContent={renderEventContent} // custom render function
+                  eventClick={this.handleEventClick}
+                  eventsSet={this.handleEvents}  */ // called after events are initialized/added/changed/removed
+                  /* you can update a remote database when these fire:
+                  eventAdd={function(){}}
+                  eventChange={function(){}}
+                  eventRemove={function(){}}
+                */
                   />
                 </div>
                 {/* /.card-body */}
@@ -316,7 +373,7 @@ function Calendar() {
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
                 >
-                  <Form.Label>Ass Line</Form.Label>
+                  <Form.Label>Line</Form.Label>
                   {/* <Form.Control
                     type="text"
                     placeholder=""
@@ -330,7 +387,7 @@ function Calendar() {
                     className={showError && ass_line === "" ? "is-invalid" : ""}
                   >
                     <option value="">โปรดเลือก Line</option>
-                    {lines.map((line) => (
+                    {data_lines.map((line) => (
                       <option value={line.id}>{line.line_name}</option>
                     ))}
                   </Form.Control>
@@ -347,12 +404,13 @@ function Calendar() {
                   <Form.Label>Modal</Form.Label>
                   <Form.Control
                     as="select"
-                    onChange={(e) => setModal(e.target.value)}
+                    //onChange={(e) => setModal(e.target.value)}
+                    onChange={data_alternate}
                     required
                     className={showError && modal === "" ? "is-invalid" : ""}
                   >
                     <option value="">โปรดเลือก Model</option>
-                    {models.map((model) => (
+                    {data_models.map((model) => (
                       <option value={model.model_name}>
                         {model.model_name}
                       </option>
@@ -368,24 +426,105 @@ function Calendar() {
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
                 >
-                  <Form.Label>Shift</Form.Label>
+                  <Form.Label>Alternate</Form.Label>
                   <Form.Control
-                    type="text"
-                    placeholder=""
-                    onChange={(e) => setShift(e.target.value)}
-                  />
+                    as="select"
+                    onChange={(e) => setAlternate(e.target.value)}
+                    //onChange={}
+                    required
+                    className={showError && alternate === "" ? "is-invalid" : ""}
+                  >
+                    <option value="">โปรดเลือก Alternates</option>
+                    {data_alternates.map((alternates) => (
+                      <option value={alternates.alternate}>
+                        {alternates.alternate}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  {showError && alternate === "" && (
+                    <Form.Control.Feedback type="invalid">
+                      Please Select alternates.
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
                 >
-                  <Form.Label>Exp-Code</Form.Label>
-                  <Form.Control
+                  <Form.Label>Shift</Form.Label>
+                  <div className="d-flex flex-row">
+                    {radioOptions.map((option) => (
+                      <Form.Check
+                        className="ml-2"
+                        key={option.value}
+                        type="radio"
+                        id={option.value}
+                        label={option.label}
+                        value={option.value}
+                        checked={shift === option.value}
+                        onChange={(e) => setShift(e.target.value)}
+                      />
+                    ))}
+                  </div>
+                  {/* <Form.Control
                     type="text"
                     placeholder=""
-                    onChange={(e) => setExp(e.target.value)}
-                  />
+                    onChange={(e) => setShift(e.target.value)}
+                  /> */}
                 </Form.Group>
+                <Row className="mb-3">
+                  <Form.Group
+                    as={Col}
+                    className="mb-3"
+                    controlId="exampleForm.ControlInput1"
+                  >
+                    <Form.Label>Exp-Code</Form.Label>
+                    <Form.Control
+                      as="select"
+                      onChange={(e) => setExp_m(e.target.value)}
+                      required
+                      className={showError && exp_m === "" ? "is-invalid" : ""}
+                    >
+                      <option value=""></option>
+                      {exp_month.map((exp_months) => (
+                        <option value={exp_months.value}>
+                          {exp_months.label}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    {showError && exp_m === "" && (
+                      <Form.Control.Feedback type="invalid">
+                        Please Select Exp.
+                      </Form.Control.Feedback>
+                    )}
+                  </Form.Group>
+                  <Form.Label className=""></Form.Label>
+                  <Form.Group
+                    as={Col}
+                    className="mb-3"
+                    controlId="exampleForm.ControlInput1"
+                  >
+                    <Form.Label></Form.Label>
+                    <Form.Control
+                      as="select"
+                      onChange={(e) => setExp_y(e.target.value)}
+                      required
+                      className={showError && exp_y === "" ? "is-invalid" : "mt-2"}
+                    >
+                      <option value=""></option>
+                      {exp_year.map((exp_years) => (
+                        <option value={exp_years.value}>
+                          {exp_years.label}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    {showError && exp_y === "" && (
+                      <Form.Control.Feedback type="invalid">
+                        Please Select Exp.
+                      </Form.Control.Feedback>
+                    )}
+                  </Form.Group>
+                </Row>
                 <Form.Group
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
@@ -445,7 +584,7 @@ function Calendar() {
             type="submit"
             variant="primary"
             onClick={handleSave}
-            //disabled={isLoading}
+          //disabled={isLoading}
           >
             {/* {isLoading ? "Saving..." : "Save"} */}Save
           </Button>

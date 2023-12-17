@@ -14,7 +14,7 @@ export default function Menu() {
           className="brand-image img-circle elevation-3"
           style={{ opacity: ".8" }}
         />
-        <span className="brand-text font-weight-light">AdminLTE 3</span>
+        <span className="brand-text font-weight-light">ERP</span>
       </NavLink>
       {/* Sidebar */}
       <div className="sidebar">
@@ -28,11 +28,11 @@ export default function Menu() {
             />
           </div>
           <NavLink to="/" className="info">     
-              Alexander Pierce
+              User_Name
           </NavLink>
         </div>
         {/* SidebarSearch Form */}
-{/*         <div className="form-inline">
+        {/*<div className="form-inline">
           <div className="input-group" data-widget="sidebar-search">
             <input
               className="form-control form-control-sidebar"
@@ -58,7 +58,7 @@ export default function Menu() {
             {/* Add icons to the links using the .nav-icon class
          with font-awesome or any other icon font library */}
             <li className="nav-item menu-open">
-              <NavLink to="/" className="nav-link active">
+              <NavLink to="/" className="nav-link">
                 <i className="nav-icon fas fa-tachometer-alt" />
                 <p>
                   Dashboard
@@ -67,9 +67,17 @@ export default function Menu() {
               </NavLink>
               <ul className="nav nav-treeview">
                 <li className="nav-item">
-                  <NavLink to="/" className="nav-link active">
+                  <NavLink to="/calender" className="nav-link">
                     <i className="far fa-circle nav-icon" />
-                    <p>Dashboard v1</p>
+                    <p>Calendar</p>
+                  </NavLink>
+                </li>
+              </ul>
+              <ul className="nav nav-treeview">
+                <li className="nav-item">
+                  <NavLink to="/Prod" className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Production</p>
                   </NavLink>
                 </li>
               </ul>
@@ -78,7 +86,7 @@ export default function Menu() {
               <NavLink to="/404" className="nav-link">
                 <i className="nav-icon fas fa-th" />
                 <p>
-                  Widgets
+                  Page 404
                   <span className="right badge badge-danger">New</span>
                 </p>
               </NavLink>

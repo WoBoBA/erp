@@ -14,8 +14,10 @@
     "@testing-library/user-event": "^13.5.0",
     "admin-lte": "3.2",
     "bootstrap": "^5.2.3",
+    "nodemon": "^2.0.22",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
+    "react-data-table-component": "^7.5.3",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
